@@ -1,0 +1,6 @@
+{
+"fdn-reverb": [
+    { "name": "feedback", "default": 30, "min": 0, "max": 125, "step": 1, "unit": "%"},
+    { "name": "😍", "default": 5000, "min": 100, "max": 20000, "step": 1, "unit": "Hz"}
+  ]
+}
