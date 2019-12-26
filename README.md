@@ -14,12 +14,10 @@ Write a file called `sliderz.json` in a directory, with a format like this:
 "window title": [
     { "name": "feedback", "default": 30, "min": 0, "max": 125, "step": 1, "unit": "%"},
     { "name": "😍", default": 5000, "min": 100, "max": 20000, "step": 1, "unit": "Hz"}
+    { "name": "🏊", default": 0.1, "min": 0.0, "max": 1.0, "step": 0.1, "unit": "☝️"}
   ]
 }
 ```
-
-All the numbers are integers, because Qt sliders are integers, and I was lazy,
-and it's good enough you can divide.
 
 Then run the `sliderz` executable from this directory, and pipe it to your
 program. The format is:
