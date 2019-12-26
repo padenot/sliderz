@@ -11,6 +11,8 @@
 #include <iostream>
 #include <QLayout>
 #include <QDir>
+#include <cmath>
+#include <iomanip>
 
 Sliderz::Sliderz(QWidget *parent)
   : QMainWindow(parent)
@@ -21,9 +23,10 @@ Sliderz::Sliderz(QWidget *parent)
   readJSON();
 }
 
-void print(int index, int value)
+void print(int index, int scale, int value)
 {
-    std::cout << index << ":" << value << std::endl;
+    std::setprecision(log10(scale));
+    std::cout << index << ":" << (float)value/scale << std::endl;
 }
 
 void Sliderz::readJSON()
@@ -73,18 +76,26 @@ void Sliderz::readJSON()
     QString name = slider_desc["name"].toString();
     QLabel* label = new QLabel(name);
     QHBoxLayout* l = new QHBoxLayout();
-    int default_value = slider_desc["default"].toInt();
-    int min = slider_desc["min"].toInt();
-    int max = slider_desc["max"].toInt();
-    int step = slider_desc["step"].toInt();
+    double default_value = slider_desc["default"].toDouble();
+    double min = slider_desc["min"].toDouble();
+    double max = slider_desc["max"].toDouble();
+    double step = slider_desc["step"].toDouble();
     QString unit = slider_desc["unit"].toString();
+    int scale = 1;
+
+    if (!(default_value == (int)default_value &&
+          min == (int)min &&
+          max == (int)max &&
+          step == (int)step)) {
+      scale = 1.0 / (step - (int)step);
+    }
 
     QLabel* min_label = new QLabel(QString::number(min));
     QLabel* max_label = new QLabel(QString::number(max));
     QLabel* val_label = new QLabel(QString::number(default_value));
 
-    connect(slider, &QSlider::valueChanged, val_label, [val_label, unit](int value) {
-        val_label->setText(QString::number(value) + unit);
+    connect(slider, &QSlider::valueChanged, val_label, [val_label, unit, scale](int value) {
+        val_label->setText(QString::number((double)value / scale) + unit);
     });
 
     l->addWidget(min_label, 0);
@@ -93,9 +104,9 @@ void Sliderz::readJSON()
     l->addSpacing(3);
     l->addWidget(val_label, 0, Qt::AlignRight);
 
-    slider->setRange(min, max);
-    slider->setTickInterval(step);
-    connect(slider,  &QSlider::valueChanged, std::bind(print, i, std::placeholders::_1));
+    slider->setRange(min * scale, max * scale);
+    slider->setTickInterval(step * scale);
+    connect(slider,  &QSlider::valueChanged, std::bind(print, i, scale, std::placeholders::_1));
     slider->setValue(default_value);
     ui->verticalLayout->addWidget(label);
     ui->verticalLayout->addLayout(l);
